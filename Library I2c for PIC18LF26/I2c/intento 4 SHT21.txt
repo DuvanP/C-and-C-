@@ -1,0 +1,149 @@
+void SHT21 (void)
+
+{
+//-----------------------------------------------------Rutina para el SHT21
+		
+	Delay10KTCYx(36);				//tiempo necesario (20ms) para que el sensor se prenda y este listo para la operacion						
+
+	SSP2CON2bits.SEN = 1;
+	while(PIR3bits.SSP2IF == 0){}	    //Condicion de START
+
+	i=SSP2CON2;
+	PIR3bits.SSP2IF = 0;			// borra la bandera IF del PIR3
+ 
+//---------- Envió la condicion STAR ---
+
+
+
+	SSP2BUF = 0x80;
+	
+
+
+
+
+
+	while(PIR3bits.SSP2IF == 0) {}	// espera el ACK
+
+	PIR3bits.SSP2IF = 0;			// borra la bandera IF del PIR3
+
+
+//----------- Envió El Byte de direccion para Escritura--
+
+	SSP2BUF = 0xE3;				// escribe Un comando de medicion de humedad  en modo HOLD MASTER
+	
+	while(PIR3bits.SSP2IF == 0){} 	// espera el ACK
+	
+	PIR3bits.SSP2IF = 0;			// borra la bandera IF del PIR3
+
+//----------- Envió El Byte de Comando---
+
+	SSP2CON2bits.RSEN = 1;
+	while(PIR3bits.SSP2IF == 0){}	    // vuelve  a enviar la COndicion de reSTAR
+
+	PIR3bits.SSP2IF = 0;			// borra la bandera IF del PIR3
+
+//----------- Envió Condicion de RESTART
+
+	SSP2BUF = 0x81;				// escribe La direccion de SHT21 y el bit en 0 en 1 para lectura
+
+	while(PIR3bits.SSP2IF == 0){} 	// espera el ACK
+
+	
+//----------- Envió El byte de direccion para lectura
+
+	Delay10KTCYx(36);				// espera 90ms para el proceso de la medicion
+
+	PIR3bits.SSP2IF = 0;			// borra la bandera IF del PIR3
+
+
+	SSP2CON2bits.RCEN = 1;			// HABILITA LA RECEPCION
+
+	while (PIR3bits.SSP2IF == 0){}	// Espera a que el sensor envie la informacion testeando la badndera del buffer
+
+	
+	D_1 = SSP2BUF; 					// Lee el dato MSB de la medición del Buffer
+//	TXREG2 = D_1;
+	
+	
+
+	SSP2CON2bits.ACKDT = 0;
+	SSP2CON2bits.ACKEN = 1;			// inicia  la condicion de ACK hacia el SHT21
+
+	while (PIR3bits.SSP2IF == 0){}	// Espera a que el sensor envie la informacion testeando la badndera del buffer
+	
+	PIR3bits.SSP2IF = 0;			// borra la bandera IF del PIR3 - ACA ESTUVO EL ERROR
+
+//----------- Habilita la recepcion y espera que la recepcion finalice
+
+
+	
+
+
+//----------- Lee lo que esta en el buffer y lo guarda
+
+	Delay10KTCYx(2);				// espera 5ms para el envio del siguiente byte	
+
+		
+
+	PIR3bits.SSP2IF = 0;			// borra la bandera IF del PIR3 - ACA ESTUVO EL ERROR	
+
+
+
+	SSP2CON2bits.RCEN = 1;			// HABILITA LA RECEPCION
+
+	while (PIR3bits.SSP2IF == 0){}	// Espera a que el sensor envie la informacion testeando la badndera del buffer
+
+	D_2 = SSP2BUF; 					// Lee el dato MSB de la medición del Buffer
+//	TXREG2 = D_2;
+
+	SSP2CON2bits.ACKDT = 0;
+	SSP2CON2bits.ACKEN = 1;			// inicia  la condicion de ACK hacia el SHT21
+
+	while (PIR3bits.SSP2IF == 0){}	// Espera a que el sensor envie la informacion testeando la badndera del buffer
+	
+	PIR3bits.SSP2IF = 0;			// borra la bandera IF del PIR3 - ACA ESTUVO EL ERROR
+
+
+//----------- Lee lo que esta en el buffer y lo guarda
+
+
+
+
+
+	Delay10KTCYx(2);				// espera 5ms para el envio del siguiente byte
+
+
+		
+	PIR3bits.SSP2IF = 0;			// borra la bandera IF del PIR3 - ACA ESTUVO EL ERROR	
+
+
+	SSP2CON2bits.RCEN = 1;			// HABILITA LA RECEPCION
+
+
+	while (PIR3bits.SSP2IF == 0){}	// Espera a que el sensor envie la informacion testeando la badndera del buffer
+
+	D_3 = SSP2BUF; 					// Lee el dato cheksum de la medición del Buffer
+//	TXREG2 = D_3;
+//	TXREG2 = 0X0D ; 
+
+	SSP2CON2bits.ACKDT = 1;
+	SSP2CON2bits.ACKEN = 1;			// inicia  la condicion de NOTACK hacia el SHT21
+
+	while (PIR3bits.SSP2IF == 0){}	// Espera a que el sensor envie la informacion testeando la badndera del buffer
+	
+	PIR3bits.SSP2IF = 0;			// borra la bandera IF del PIR3 - ACA ESTUVO EL ERROR
+
+	Delay10KTCYx(2);				// espera 5ms para que SHT21 reconozca el NOTACK
+
+	SSP2CON2bits.PEN = 1;			// Inicia la condicion de STOP
+	while (PIR3bits.SSP2IF == 0){}	
+
+	PIR3bits.SSP2IF = 0;			// borra la bandera IF del PIR3
+
+//----------- Habilita la recepcion y espera que la recepcion finalice
+
+
+
+
+
+}

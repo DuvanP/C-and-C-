@@ -1,0 +1,63 @@
+void SHT21 (void)
+
+{
+//-----------------------------------------------------Rutina para el SHT21
+	// FIN PRO = Espera a que finalice la operacion en el 
+	//			 modulo; ACK, NOTACK, START, STOP, RESTART, RECEPCION y TRANSMISION
+	// BoR	   = Borra La Bandera IF del PIR3
+
+//---------- Envió la condicion STAR ---
+		
+	Delay10KTCYx(36);				// Tiempo necesario (20ms) para que el sensor se prenda y este listo para la operacion			SSP2CON2bits.SEN = 1;			// Condicion de START
+	while(PIR3bits.SSP2IF == 0){}	// FIN PRO
+	PIR3bits.SSP2IF = 0;			// BoR IF
+	SSP2BUF = 0x70;					// Envia un byte de error por que el modulo falla por alguna razon que no sé
+	while(PIR3bits.SSP2IF == 0) {}	// FIN PRO
+	PIR3bits.SSP2IF = 0;			// BoR IF	
+	SSP2BUF = 0x80;					// Envió El Byte de direccion para Escritura
+	while(PIR3bits.SSP2IF == 0) {}	// FIN PRO
+	PIR3bits.SSP2IF = 0;			// BoR IF
+	SSP2BUF = 0xE3;					// escribe Un comando de medicion de humedad  en modo HOLD MASTER
+	while(PIR3bits.SSP2IF == 0){} 	// FIN PRO
+	PIR3bits.SSP2IF = 0;			// BoR IF
+
+//----------- Envió Condicion de RESTART
+
+	SSP2CON2bits.RSEN = 1;			// vuelve  a enviar la COndicion de RESTART
+	while(PIR3bits.SSP2IF == 0){}	// FIN PRO
+	PIR3bits.SSP2IF = 0;			// BoR IF
+	SSP2BUF = 0x81;					// escribe La direccion de SHT21 y el bit en 0 en 1 para lectura
+	while(PIR3bits.SSP2IF == 0){} 	// FIN PRO
+	Delay10KTCYx(36);				// espera 90ms para el proceso de la medicion
+	PIR3bits.SSP2IF = 0;			// BoR IF
+
+//----------- RECEPCION DATO 2 -----
+
+	SSP2CON2bits.RCEN = 1;			// HABILITA LA RECEPCION
+	while (PIR3bits.SSP2IF == 0){}	// FIN PRO
+	PIR3bits.SSP2IF = 0;			// BoR IF	
+	D_1 = SSP2BUF; 					// Lee el dato MSB de la medición del Buffer
+//	TXREG2 = D_1;
+	SSP2CON2bits.ACKDT = 0;
+	SSP2CON2bits.ACKEN = 1;			// inicia  la condicion de ACK hacia el SHT21
+	while (PIR3bits.SSP2IF == 0){}	// FIN PRO
+
+//----------- RECEPCION DATO 1 -----
+
+	Delay10KTCYx(2);				// espera 5ms para el envio del siguiente byte	
+	PIR3bits.SSP2IF = 0;			// BoR IF
+	SSP2CON2bits.RCEN = 1;			// HABILITA LA RECEPCION
+	while (PIR3bits.SSP2IF == 0){}	// FIN PRO
+	PIR3bits.SSP2IF = 0;			// BoR IF
+	D_2 = SSP2BUF; 					// Lee el dato lSB de la medición del Buffer
+//	TXREG2 = D_2;
+	SSP2CON2bits.ACKDT = 1;
+	SSP2CON2bits.ACKEN = 1;			// inicia  la condicion de NOTACK hacia el SHT21
+	while (PIR3bits.SSP2IF == 0){}	// FIN PRO
+	PIR3bits.SSP2IF = 0;			// BoR IF
+	Delay10KTCYx(2);				// espera 5ms para que SHT21 reconozca el NOTACK
+	SSP2CON2bits.PEN = 1;			// Inicia la condicion de STOP
+	while (PIR3bits.SSP2IF == 0){}	// FIN PRO
+	PIR3bits.SSP2IF = 0;			// BoR IF
+
+}

@@ -1,0 +1,6 @@
+
+
+
+#include<p18lf26k22.h>
+#include<delays.h>
+#include<stdio.h>

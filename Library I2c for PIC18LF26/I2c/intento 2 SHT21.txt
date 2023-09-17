@@ -1,0 +1,48 @@
+//-----------------------------------------------------Rutina para el SHT21
+	
+
+
+	SSP2CON2bits.SEN = 1;
+	while(SSP2CON2bits.SEN == 0){}	    //COndicion de STAR
+
+	PIR3bits.SSP2IF = 1;			// borra la bandera
+
+	WriteI2C2(0x80);				// Se escribe la direccion del SHT21 y el bit 0 en 0 para escritura
+
+	while(SSP2CON2bits.ACKSTAT) {}	// espera el ACK
+
+	PIR3bits.SSP2IF = 1;
+
+	WriteI2C2(0xE5);				// escribe Un comando de medicion de humedad  en modo HOLD MASTER
+	
+	while(SSP2CON2bits.ACKSTAT){} 	// espera el ACK
+	
+
+
+	SSP2CON2bits.RSEN = 1;
+	while(SSP2CON2bits.RSEN){}	    // vuelve  a enviar la COndicion de reSTAR
+
+	WriteI2C2(0x81);				// escribe La direccion de SHT21 y el bit en 0 en 1 para lectura
+
+	while(SSP2CON2bits.ACKSTAT){} 	// espera el ACK
+
+	i = 'N';
+
+	SSP2CON2bits.RCEN = 1;			// HABILITA LA RECEPCION
+
+	SSP2CON2bits.ACKDT = 0;
+
+	while (PIR3bits.SSP2IF == 0){}	// Espera a que el sensor envie la informacion testeando la badndera del buffer
+	PIR3bits.SSP2IF = 0;
+	SSP2CON2bits.ACKEN = 1;			// inicia  la condicion de ACK hacia el SHT21
+	TXREG2 = 'B';
+	i = SSP2BUF;
+	TXREG2 = i; 	
+
+
+
+
+	while (PIR3bits.SSP2IF == 0){}
+	PIR3bits.SSP2IF = 0;
+
+	SSP2CON2bits.RCEN = 1;			// HABILITA LA RECEPCION

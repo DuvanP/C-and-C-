@@ -1,0 +1,44 @@
+//-----------------------------------------------------Rutina para el SHT21
+	
+	SSP2CON2bits.SEN = 1;
+	while(SSP2CON2bits.SEN){}	    //COndicion de STAR
+
+	WriteI2C2(0x80);				// Se escribe la direccion del SHT21 y el bit 0 en 0 para escritura
+
+	while(SSP2CON2bits.ACKSTAT) {}	// espera el ACK
+
+	WriteI2C2(0xE5);				// escribe Un comando de medicion de humedad  en modo HOLD MASTER
+	
+	while(SSP2CON2bits.ACKSTAT){} 	// espera el ACK
+
+	SSP2CON2bits.SEN = 1;
+	while(SSP2CON2bits.SEN){}	    // vuelve  a enviar la COndicion de STAR
+
+	WriteI2C2(0x81);				// escribe La direccion de SHT21 y el bit en 0 en 1 para lectura
+
+	while(SSP2CON2bits.ACKSTAT){} 	// espera el ACK	
+
+	while (SSP2STATbits.BF == 0){}	// Espera a que el sensor envie la informacion testeando la badndera del buffer
+
+	D_1 = SSP2BUF ;					// Lee el primer byte de la memoria y borra la bandera BF
+
+	SSP2CON2bits.ACKDT = 0;
+	SSP2CON2bits.ACKEN = 1;			// inicia  la condicion de ACK hacia el SHT21
+
+	while (SSP2STATbits.BF == 0){}	// Espera a que el sensor envie la informacion testeando la badndera del buffer
+
+	D_2 = SSP2BUF ;					// Lee el segundo byte de la memoria y borra la bandera BF
+
+	SSP2CON2bits.ACKDT = 0;
+	SSP2CON2bits.ACKEN = 1;			// inicia  la condicion de ACK hacia el SHT21
+	
+
+	while (SSP2STATbits.BF == 0){}	// Espera a que el sensor envie la informacion testeando la badndera del buffer
+
+	D_3 = SSP2BUF ;					// Lee el tercer byte de la memoria y borra la bandera BF
+
+	SSP2CON2bits.ACKDT = 1;
+	SSP2CON2bits.ACKEN = 1;			// inicia  la condicion de NOTACK hacia el SHT21
+	
+	SSP2CON2bits.PEN = 1;
+	while(SSP2CON2bits.PEN){}		// Inicia la condicion de STOP

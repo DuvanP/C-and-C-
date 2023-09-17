@@ -1,0 +1,19 @@
+# MPLAB IDE generated this makefile for use with GNU make.
+# Project: i2c.mcp
+# Date: Fri May 27 11:25:44 2016
+
+AS = MPASMWIN.exe
+CC = mcc18.exe
+LD = mplink.exe
+AR = mplib.exe
+RM = rm
+
+i2c.cof : SHT21.o
+	$(LD) /p18LF26K22 "SHT21.o" /u_CRUNTIME /z__MPLAB_BUILD=1 /o"i2c.cof" /M"i2c.map" /W
+
+SHT21.o : SHT21.c C:/Program\ Files\ (x86)/Microchip/mplabc18/v3.47/h/delays.h C:/Program\ Files\ (x86)/Microchip/mplabc18/v3.47/h/stdio.h C:/Program\ Files\ (x86)/Microchip/mplabc18/v3.47/h/i2c.h SHT21.c C:/Program\ Files\ (x86)/Microchip/mplabc18/v3.47/h/p18lf26k22.h C:/Program\ Files\ (x86)/Microchip/mplabc18/v3.47/h/p18cxxx.h C:/Program\ Files\ (x86)/Microchip/mplabc18/v3.47/h/stdarg.h C:/Program\ Files\ (x86)/Microchip/mplabc18/v3.47/h/stddef.h C:/Program\ Files\ (x86)/Microchip/mplabc18/v3.47/h/pconfig.h
+	$(CC) -p=18LF26K22 "SHT21.c" -fo="SHT21.o" -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa-
+
+clean : 
+	$(RM) "SHT21.o" "i2c.cof" "i2c.hex"
+
